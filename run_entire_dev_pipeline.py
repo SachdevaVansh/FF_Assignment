@@ -19,6 +19,7 @@ def main():
 
     # Formula used to construct venv_name in setup_script aka 'create_virtual_env.py'
     venv_name = "venv_" + Path(os.getcwd()).stem.lower()
+    #venv_name = "venv_dev_pipeline"
 
     # Step 2: Run training script in venv
     print(f"\n Step 2: Running training script in venv...")

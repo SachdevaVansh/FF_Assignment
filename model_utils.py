@@ -45,13 +45,11 @@ def get_data_loaders(data_dir: str, batch_size: int = 32) -> Tuple[DataLoader, D
         batch_size=batch_size, 
         shuffle=True, 
         pin_memory=True,  # Fast transfer to GPU
-        num_workers=4     # Parallel loading
     )
     test_loader = DataLoader(
         test_dataset, 
         batch_size=batch_size, 
         pin_memory=True,  # Fast transfer to GPU
-        num_workers=4     # Parallel loading
     )
     return train_loader, test_loader, len(train_dataset.classes)
 

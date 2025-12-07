@@ -37,7 +37,7 @@ def unzip_and_delete(folder_path = os.getcwd()):
         except FileNotFoundError:
             print(f"{zip_file} not found...")
         except Exception as e:
-            print(f"Error with {zip_file}: e")
+            print(f"Error with {zip_file}: {e}")
 
 def setup_venv(venv_dir='venv', requirements_file='requirements.txt'):
     """
@@ -65,12 +65,31 @@ def setup_venv(venv_dir='venv', requirements_file='requirements.txt'):
     else:  # Unix/Linux/macOS
         pip_path = venv_path / 'bin' / 'pip'
 
-    # Install from requirements.txt
-    subprocess.check_call([str(pip_path), 'install', '-r', str(req_path)])
+    # Prepare environment with venv path
+    env = os.environ.copy()
+    if os.name == 'nt':
+        env["PATH"] = str(venv_path / 'Scripts') + os.pathsep + env["PATH"]
+    else:
+        env["PATH"] = str(venv_path / 'bin') + os.pathsep + env["PATH"]
+
+    # Determine python path in the venv
+    if os.name == 'nt':
+        venv_python = venv_path / 'Scripts' / 'python.exe'
+    else:
+        venv_python = venv_path / 'bin' / 'python'
+
+    # Upgrade pip and install from requirements.txt
+    subprocess.check_call([str(venv_python), '-m', 'pip', 'install', '--upgrade', 'pip'], env=env)
+    
+    # Install cmake first as it is required for building onnx
+    subprocess.check_call([str(pip_path), 'install', 'cmake'], env=env)
+    
+    subprocess.check_call([str(pip_path), 'install', '-r', str(req_path)], env=env)
     print(f"Installed packages from '{requirements_file}'")
 
 if __name__ == "__main__":
     venv_name = "venv_" + Path(os.getcwd()).stem.lower()
+    #venv_name = "venv_dev_pipeline"
     requirements = 'requirements.txt'
 
     try:
